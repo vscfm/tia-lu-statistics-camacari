@@ -21,212 +21,82 @@ class Statistics:
         self.dataset = dataset
 
     def mean(self, column):
-        """
-        Calcula a média aritmética de uma coluna.
-
-        Fórmula:
-        $$ \mu = \frac{1}{N} \sum_{i=1}^{N} x_i $$
-
-        Parâmetros
-        ----------
-        column : str
-            O nome da coluna (chave do dicionário do dataset).
-
-        Retorno
-        -------
-        float
-            A média dos valores na coluna.
-        """
-        pass
+        values = self.dataset[column]
+        return sum(values) / len(values)
 
     def median(self, column):
-        """
-        Calcula a mediana de uma coluna.
-
-        A mediana é o valor central de um conjunto de dados ordenado.
-
-        Parâmetros
-        ----------
-        column : str
-            O nome da coluna (chave do dicionário do dataset).
-
-        Retorno
-        -------
-        float
-            O valor da mediana da coluna.
-        """
-        pass
+        values = sorted(self.dataset[column])
+        n = len(values)
+        mid = n // 2
+        if n % 2 == 0:
+            return (values[mid - 1] + values[mid]) / 2
+        return values[mid]
 
     def mode(self, column):
-        """
-        Encontra a moda (ou modas) de uma coluna.
-
-        A moda é o valor que aparece com mais frequência no conjunto de dados.
-
-        Parâmetros
-        ----------
-        column : str
-            O nome da coluna (chave do dicionário do dataset).
-
-        Retorno
-        -------
-        list
-            Uma lista contendo o(s) valor(es) da moda.
-        """
-        pass
+        values = self.dataset[column]
+        freq = {}
+        for v in values:
+            freq[v] = freq.get(v, 0) + 1
+        max_freq = max(freq.values())
+        return [k for k, v in freq.items() if v == max_freq]
 
     def stdev(self, column):
-        """
-        Calcula o desvio padrão populacional de uma coluna.
-
-        Fórmula:
-        $$ \sigma = \sqrt{\frac{\sum_{i=1}^{N} (x_i - \mu)^2}{N}} $$
-
-        Parâmetros
-        ----------
-        column : str
-            O nome da coluna (chave do dicionário do dataset).
-
-        Retorno
-        -------
-        float
-            O desvio padrão dos valores na coluna.
-        """
-        pass
+        values = self.dataset[column]
+        mean_val = self.mean(column)
+        variance = sum((x - mean_val) ** 2 for x in values) / len(values)
+        return variance ** 0.5
 
     def variance(self, column):
-        """
-        Calcula a variância populacional de uma coluna.
-
-        Fórmula:
-        $$ \sigma^2 = \frac{\sum_{i=1}^{N} (x_i - \mu)^2}{N} $$
-
-        Parâmetros
-        ----------
-        column : str
-            O nome da coluna (chave do dicionário do dataset).
-
-        Retorno
-        -------
-        float
-            A variância dos valores na coluna.
-        """
-        pass
+        values = self.dataset[column]
+        mean_val = self.mean(column)
+        return sum((x - mean_val) ** 2 for x in values) / len(values)
 
     def covariance(self, column_a, column_b):
-        """
-        Calcula a covariância entre duas colunas.
-
-        Fórmula:
-        $$ \text{cov}(X, Y) = \frac{\sum_{i=1}^{N} (x_i - \mu_x)(y_i - \mu_y)}{N} $$
-
-        Parâmetros
-        ----------
-        column_a : str
-            O nome da primeira coluna (X).
-        column_b : str
-            O nome da segunda coluna (Y).
-
-        Retorno
-        -------
-        float
-            O valor da covariância entre as duas colunas.
-        """
-        pass
+        x = self.dataset[column_a]
+        y = self.dataset[column_b]
+        if len(x) != len(y):
+            raise ValueError("As colunas devem ter o mesmo tamanho.")
+        mean_x = self.mean(column_a)
+        mean_y = self.mean(column_b)
+        return sum((xi - mean_x) * (yi - mean_y) for xi, yi in zip(x, y)) / len(x)
 
     def itemset(self, column):
-        """
-        Retorna o conjunto de itens únicos em uma coluna.
-
-        Parâmetros
-        ----------
-        column : str
-            O nome da coluna (chave do dicionário do dataset).
-
-        Retorno
-        -------
-        set
-            Um conjunto com os valores únicos da coluna.
-        """
-        pass
+        return set(self.dataset[column])
 
     def absolute_frequency(self, column):
-        """
-        Calcula a frequência absoluta de cada item em uma coluna.
-
-        Parâmetros
-        ----------
-        column : str
-            O nome da coluna (chave do dicionário do dataset).
-
-        Retorno
-        -------
-        dict
-            Um dicionário onde as chaves são os itens e os valores são
-            suas contagens (frequência absoluta).
-        """
-        pass
+        values = self.dataset[column]
+        freq = {}
+        for v in values:
+            freq[v] = freq.get(v, 0) + 1
+        return freq
 
     def relative_frequency(self, column):
-        """
-        Calcula a frequência relativa de cada item em uma coluna.
-
-        Parâmetros
-        ----------
-        column : str
-            O nome da coluna (chave do dicionário do dataset).
-
-        Retorno
-        -------
-        dict
-            Um dicionário onde as chaves são os itens e os valores são
-            suas proporções (frequência relativa).
-        """
-        pass
+        abs_freq = self.absolute_frequency(column)
+        total = sum(abs_freq.values())
+        return {k: v / total for k, v in abs_freq.items()}
 
     def cumulative_frequency(self, column, frequency_method='absolute'):
-        """
-        Calcula a frequência acumulada (absoluta ou relativa) de uma coluna.
-
-        A frequência é calculada sobre os itens ordenados.
-
-        Parâmetros
-        ----------
-        column : str
-            O nome da coluna (chave do dicionário do dataset).
-        frequency_method : str, opcional
-            O método a ser usado: 'absolute' para contagem acumulada ou
-            'relative' para proporção acumulada (padrão é 'absolute').
-
-        Retorno
-        -------
-        dict
-            Um dicionário ordenado com os itens como chaves e suas
-            frequências acumuladas como valores.
-        """
-        pass
+        if frequency_method == 'absolute':
+            freq = self.absolute_frequency(column)
+        elif frequency_method == 'relative':
+            freq = self.relative_frequency(column)
+        else:
+            raise ValueError("Método inválido. Use 'absolute' ou 'relative'.")
+        
+        acumulado = {}
+        soma = 0
+        for k in sorted(freq.keys()):
+            soma += freq[k]
+            acumulado[k] = soma
+        return acumulado
 
     def conditional_probability(self, column, value1, value2):
-        """
-        Calcula a probabilidade condicional P(X_i = value1 | X_{i-1} = value2).
-
-        Este método trata a coluna como uma sequência e calcula a probabilidade
-        de encontrar `value1` imediatamente após `value2`.
-
-        Fórmula: P(A|B) = Contagem de sequências (B, A) / Contagem total de B
-
-        Parâmetros
-        ----------
-        column : str
-            O nome da coluna (chave do dicionário do dataset).
-        value1 : any
-            O valor do evento consequente (A).
-        value2 : any
-            O valor do evento condicionante (B).
-
-        Retorno
-        -------
-        float
-            A probabilidade condicional, um valor entre 0 e 1.
-        """
-        pass
+        values = self.dataset[column]
+        total_b = 0
+        count_ba = 0
+        for i in range(len(values) - 1):
+            if values[i] == value2:
+                total_b += 1
+                if values[i + 1] == value1:
+                    count_ba += 1
+        return count_ba / total_b if total_b > 0 else 0.0
